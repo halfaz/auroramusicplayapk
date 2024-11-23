@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+
+    <button id="menuToggle" class="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
     <div class="container">
         <div class="sidebar">
             <h1>Aurora</h1>
@@ -18,6 +22,28 @@
             <div class="library-section">
                 <h2>Your Library</h2>
                 <ul id="musicList"></ul>
+
+                <button id="settings-button">Settings</button>
+            </div>
+        
+            <!-- Settings Modal -->
+            <div id="settings-modal" style="display: none;">
+                <h2>Change Theme Colors</h2>
+                <label for="background-color">Background Color:</label>
+                <input type="color" id="background-color" value="#121212"><br>
+        
+                <label for="text-color">Text Color:</label>
+                <input type="color" id="text-color" value="#ffffff"><br>
+        
+                <label for="accent-color">Accent Color:</label>
+                <input type="color" id="accent-color" value="#1DB954"><br>
+        
+                <label for="hover-color">Hover Color:</label>
+                <input type="color" id="hover-color" value="#282828"><br>
+                <div class="settings-buttons">
+                    <button id="save-and-close">Save & Close</button>
+                </div>
+            </div>
             </div>
         </div>
         

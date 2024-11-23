@@ -3,7 +3,6 @@ let currentSongIndex = 0;
 let isPlaying = false;
 const audioPlayer = document.getElementById('audioPlayer');
 
-
 const playlists = [
     {
         id: 1,
@@ -33,45 +32,24 @@ const playlists = [
 
 let currentPlaylist = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetchMusicList();
-    initializeEventListeners();
-});
-
-
-// Request notification permission immediately when page loads
-
 if ('Notification' in window) {
     Notification.requestPermission().then(permission => {
         console.log('Notification permission:', permission);
     });
 }
 
-function notifyIfUnfocused(type, songTitle, artistName = '') {
+document.addEventListener('DOMContentLoaded', () => {
+    fetchMusicList();
+    initializeEventListeners();
+});
+
+function notifyIfUnfocused(message) {
     if ('Notification' in window) {
         if (Notification.permission === 'granted') {
             try {
-                // Determine icon and message based on type
-                let icon, message;
-                switch(type) {
-                    case 'play':
-                        icon = 'icons/play.png';  // Replace with your play icon path
-                        message = `Now Playing: ${songTitle}${artistName ? ` by ${artistName}` : ''}`;
-                        break;
-                    case 'pause':
-                        icon = 'icons/pause.png';  // Replace with your pause icon path
-                        message = `Paused: ${songTitle}`;
-                        break;
-                    case 'next':
-                        icon = 'icons/next.png';  // Replace with your next track icon path
-                        message = `New Track: ${songTitle}${artistName ? ` by ${artistName}` : ''}`;
-                        break;
-                }
-
                 const notification = new Notification('Aurora Music Player', {
                     body: message,
-                    icon: icon || 'default-album.webp',
-                    badge: 'default-album.webp',
+                    icon: 'default-album.webp',
                     silent: false,
                     tag: 'aurora-music-' + Date.now(),
                     requireInteraction: false
@@ -86,14 +64,12 @@ function notifyIfUnfocused(type, songTitle, artistName = '') {
                     if (notification) notification.close();
                 }, 5000);
 
-                console.log('Notification sent:', message);
             } catch (error) {
                 console.error('Notification error:', error);
             }
         }
     }
 }
-
 
 function initializeEventListeners() {
     const playBtn = document.getElementById('playBtn');
@@ -102,6 +78,8 @@ function initializeEventListeners() {
     const volumeControl = document.getElementById('volume');
     const progressBar = document.querySelector('.progress-bar');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.querySelector('.sidebar');
 
     playBtn.addEventListener('click', togglePlay);
     prevBtn.addEventListener('click', playPrevious);
@@ -112,34 +90,51 @@ function initializeEventListeners() {
     
     audioPlayer.addEventListener('timeupdate', updateProgress);
     audioPlayer.addEventListener('ended', () => playNext());
-
-    // Add notification event listeners
+    
     audioPlayer.addEventListener('play', () => {
         const currentSong = currentPlaylist?.songs[currentSongIndex];
         if (currentSong) {
             const songTitle = currentSong.metadata?.title || currentSong.name.replace(/\.(mp3|m4a|wav)$/i, '');
             const artistName = currentSong.metadata?.artist || 'Unknown Artist';
-            notifyIfUnfocused('play', songTitle, artistName);
+            notifyIfUnfocused(`▶️ Now Playing\n${songTitle}\nby ${artistName}`);
         }
     });
-    
+
     audioPlayer.addEventListener('pause', () => {
         const currentSong = currentPlaylist?.songs[currentSongIndex];
         if (currentSong) {
             const songTitle = currentSong.metadata?.title || currentSong.name.replace(/\.(mp3|m4a|wav)$/i, '');
-            notifyIfUnfocused('pause', songTitle);
+            notifyIfUnfocused(`⏸️ Paused\n${songTitle}`);
         }
     });
-    
+
     audioPlayer.addEventListener('loadstart', () => {
         if (currentPlaylist && currentPlaylist.songs[currentSongIndex]) {
             const song = currentPlaylist.songs[currentSongIndex];
             const songTitle = song.metadata?.title || song.name.replace(/\.(mp3|m4a|wav)$/i, '');
             const artistName = song.metadata?.artist || 'Unknown Artist';
-            notifyIfUnfocused('next', songTitle, artistName);
+            notifyIfUnfocused(`🎵 New Track\n${songTitle}\nby ${artistName}`);
         }
     });
     
+    let isMenuOpen = false;
+    menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent document click from interfering
+        isMenuOpen = !isMenuOpen;
+        sidebar.classList.toggle('show');
+        menuToggle.innerHTML = isMenuOpen ? 
+            '<i class="fas fa-times"></i>' : 
+            '<i class="fas fa-bars"></i>';
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (isMenuOpen && !sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+            isMenuOpen = false;
+            sidebar.classList.remove('show');
+            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    });
     document.addEventListener('fullscreenchange', updateFullscreenButton);
 }
 
@@ -313,3 +308,28 @@ function updateFullscreenButton() {
         fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
     }
 }
+
+document.getElementById('settings-button').addEventListener('click', function() {
+    document.getElementById('settings-modal').style.display = 'block';
+});
+
+document.getElementById('close-settings').addEventListener('click', function() {
+    document.getElementById('settings-modal').style.display = 'none';
+});
+
+document.getElementById('save-settings').addEventListener('click', function() {
+    const backgroundColor = document.getElementById('background-color').value;
+    const textColor = document.getElementById('text-color').value;
+    const accentColor = document.getElementById('accent-color').value;
+    const hoverColor = document.getElementById('hover-color').value;
+
+    document.documentElement.style.setProperty('--background-color', backgroundColor);
+    document.documentElement.style.setProperty('--text-color', textColor);
+    document.documentElement.style.setProperty('--accent-color', accentColor);
+    document.documentElement.style.setProperty('--hover-color', hoverColor);
+
+    document.getElementById('settings-modal').style.display = 'none';
+});
+
+
+
