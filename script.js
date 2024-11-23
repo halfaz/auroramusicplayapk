@@ -309,27 +309,6 @@ function updateFullscreenButton() {
     }
 }
 
-document.getElementById('settings-button').addEventListener('click', function() {
-    document.getElementById('settings-modal').style.display = 'block';
-});
-
-document.getElementById('close-settings').addEventListener('click', function() {
-    document.getElementById('settings-modal').style.display = 'none';
-});
-
-document.getElementById('save-settings').addEventListener('click', function() {
-    const backgroundColor = document.getElementById('background-color').value;
-    const textColor = document.getElementById('text-color').value;
-    const accentColor = document.getElementById('accent-color').value;
-    const hoverColor = document.getElementById('hover-color').value;
-
-    document.documentElement.style.setProperty('--background-color', backgroundColor);
-    document.documentElement.style.setProperty('--text-color', textColor);
-    document.documentElement.style.setProperty('--accent-color', accentColor);
-    document.documentElement.style.setProperty('--hover-color', hoverColor);
-
-    document.getElementById('settings-modal').style.display = 'none';
-});
 
 
 
